@@ -37,7 +37,7 @@ public class QUICVersionPacketTest {
         final List<QUICVersion> supportedVersions = Lists.newArrayList(QUICVersion.DRAFT_29, QUICVersion.ONE);
         final QUICVersionPacket packet = QUICVersionPacket.from(destConnId, sourceConnId, supportedVersions);
 
-        assertEquals(0x8, packet.header);
+        assertEquals(0xC, packet.header); // 0x8 and 0x4 set
         assertEquals(QUICVersion.NEGOTIATING, packet.version);
 
         assertEquals(destConnId.readableBytes(), packet.destConnIdLength);
@@ -49,7 +49,7 @@ public class QUICVersionPacketTest {
     }
 
     @Test
-    public void PayloadToByteBuf() {
+    public void payloadToByteBuf() {
         final List<QUICVersion> supportedVersions = Lists.newArrayList(QUICVersion.DRAFT_29, QUICVersion.ONE);
         Payload payload = new Payload(supportedVersions);
 

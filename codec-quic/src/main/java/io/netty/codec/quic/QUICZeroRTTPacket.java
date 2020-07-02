@@ -17,37 +17,26 @@
 package io.netty.codec.quic;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
+import io.netty.codec.quic.QUICLongHeaderPacket.PacketType;
 
-public class QUICInitialPacket extends QUICLongHeaderPacket<QUICInitialPacket.Payload> {
+public class QUICZeroRTTPacket extends QUICLongHeaderPacket<QUICZeroRTTPacket.Payload> {
     public static class Payload implements QUICLongHeaderPacket.ToByteBuf {
-        public final ByteBuf token;
         public final QUICPacketNumber number;
-        public final ByteBuf packetPayload;
 
-        public Payload(final ByteBuf token, final QUICPacketNumber number, final ByteBuf packetPayload) {
-            this.token = token;
+        public Payload(final QUICPacketNumber number) {
             this.number = number;
-            this.packetPayload = packetPayload;
         }
 
         @Override
         public ByteBuf toByteBuf() {
-            return Unpooled.wrappedBuffer(Unpooled.copyInt(this.token.readableBytes()),
-                                          this.token,
-                                          /* Length of remaining data (packet number plus payload) */
-                                          Unpooled.copyInt(this.number.bytesNeeded() + this.packetPayload.readableBytes()),
-                                          this.number.toByteBuf(),
-                                          this.packetPayload);
+            return null;
         }
     }
 
-    public QUICInitialPacket(final QUICVersion version,
+    public QUICZeroRTTPacket(final QUICVersion version,
                              final ByteBuf destConnId, final ByteBuf sourceConnId,
                              final Payload payload) {
-        super(PacketType.Initial,
-              /* Reserved Bits (2), Packet Number Length (2)*/
-              payload.number.encodedLength, version,
+        super(PacketType.ZeroRTT, payload.number.encodedLength, version,
               destConnId, sourceConnId, payload);
     }
 }

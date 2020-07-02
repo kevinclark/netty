@@ -45,7 +45,8 @@ public class QUICVersionPacket extends QUICLongHeaderPacket<QUICVersionPacket.Pa
     }
 
     private QUICVersionPacket(final ByteBuf destConnId, final ByteBuf sourceConnId, final Payload payload) {
-        super((byte) 0x8 /* Just HeaderForm set */, QUICVersion.NEGOTIATING,
+        super((byte) (0x8 | 0x4) /* Draft 29 says just Header Form MUST be set, but SHOULD also set 0x4 */,
+              QUICVersion.NEGOTIATING,
               destConnId, sourceConnId,
               payload);
     }

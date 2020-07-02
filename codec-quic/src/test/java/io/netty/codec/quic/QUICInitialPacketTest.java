@@ -27,47 +27,17 @@ import static org.junit.Assert.*;
 
 public class QUICInitialPacketTest {
     @Test
-    public void payloadToByteBufWithFullWidthPacketNumberHasPNLength3() {
+    public void payloadToByteBuf() {
         final ByteBuf tok = Unpooled.wrappedBuffer("token".getBytes(Charset.defaultCharset()));
         final ByteBuf payloadBuf = Unpooled.wrappedBuffer("It's a payload!".getBytes(Charset.defaultCharset()));
         final int num = 1 << 25;
 
-        final Payload payload = new Payload(tok, num, payloadBuf);
-
-        assertEquals(num, payload.packetNumber);
-        assertEquals(3, payload.packetNumberLength);
-        assertEquals(payloadBuf.slice(), payload.packetPayload.slice());
-        assertEquals(tok.slice(), payload.token.slice());
-    }
-
-    @Test
-    public void payloadToByteBufWithThreeBytePacketNumberHasPNLength2() {
-        final ByteBuf tok = Unpooled.wrappedBuffer("token".getBytes(Charset.defaultCharset()));
-        final ByteBuf payloadBuf = Unpooled.wrappedBuffer("It's a payload!".getBytes(Charset.defaultCharset()));
-        final int num = 1 << 23;
-
-        final Payload payload = new Payload(tok, num, payloadBuf);
-        assertEquals(2, payload.packetNumberLength);
-    }
-
-    @Test
-    public void payloadToByteBufWithTwoBytePacketNumberHasPNLength1() {
-        final ByteBuf tok = Unpooled.wrappedBuffer("token".getBytes(Charset.defaultCharset()));
-        final ByteBuf payloadBuf = Unpooled.wrappedBuffer("It's a payload!".getBytes(Charset.defaultCharset()));
-        final int num = 1 << 15;
-
-        final Payload payload = new Payload(tok, num, payloadBuf);
-        assertEquals(1, payload.packetNumberLength);
-    }
-
-
-    @Test
-    public void payloadToByteBufWithOneBytePacketNumberHasPNLength0() {
-        final ByteBuf tok = Unpooled.wrappedBuffer("token".getBytes(Charset.defaultCharset()));
-        final ByteBuf payloadBuf = Unpooled.wrappedBuffer("It's a payload!".getBytes(Charset.defaultCharset()));
-        final int num = 1 << 7;
-
-        final Payload payload = new Payload(tok, num, payloadBuf);
-        assertEquals(0, payload.packetNumberLength);
+        final ByteBuf buf = new Payload(tok, new QUICPacketNumber(num), payloadBuf).toByteBuf();
+        assertEquals(5, buf.readInt()); // Tok length
+        assertEquals(tok.slice(), buf.readBytes(5)); // Then tok
+        // Then remaining length, which is the packet number length plus the length of payloadBuf
+        assertEquals(4 + payloadBuf.readableBytes(), buf.readInt());
+        assertEquals(1 << 25, buf.readInt());
+        assertEquals(payloadBuf, buf.slice());
     }
 }
