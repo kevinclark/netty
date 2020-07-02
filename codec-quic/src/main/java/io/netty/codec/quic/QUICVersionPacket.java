@@ -22,7 +22,7 @@ import io.netty.buffer.Unpooled;
 import java.util.List;
 
 public class QUICVersionPacket extends QUICLongHeaderPacket<QUICVersionPacket.Payload> {
-    public static class Payload implements QUICLongHeaderPacket.Payload {
+    public static class Payload implements QUICLongHeaderPacket.ToByteBuf {
         final List<QUICVersion> supportedVersions;
 
         Payload(final List<QUICVersion> supportedVersions) {

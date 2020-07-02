@@ -31,8 +31,9 @@ package io.netty.codec.quic;/*
  */
 
 import io.netty.buffer.ByteBuf;
+import io.netty.codec.quic.QUICLongHeaderPacket.ToByteBuf;
 
-public class QUICLongHeaderPacket<P extends QUICLongHeaderPacket.Payload> {
+public class QUICLongHeaderPacket<Payload extends ToByteBuf> {
     // 17.2 Long Header Packets - QUIC Draft 29
     // NOTE: The last 7 bits of header are considered version specific per QUIC-INVARIANTS draft
     //       Possible we'll want to encapsulate that in some way.
@@ -46,11 +47,11 @@ public class QUICLongHeaderPacket<P extends QUICLongHeaderPacket.Payload> {
     final byte sourceConnIdLength; // Source Connection ID Length (8),
     final ByteBuf sourceConnId; // Source Connection ID (0..160),
 
-    interface Payload {
+    interface ToByteBuf {
         ByteBuf toByteBuf();
     };
 
-    final P payload;
+    final Payload payload;
 
     public enum PacketType {
         Initial((byte) 0x0),
@@ -67,7 +68,7 @@ public class QUICLongHeaderPacket<P extends QUICLongHeaderPacket.Payload> {
 
     protected QUICLongHeaderPacket(byte header, final QUICVersion version,
                                    final ByteBuf destConnId, final ByteBuf sourceConnId,
-                                   final P payload) {
+                                   final Payload payload) {
         this.header = header;
         this.version = version;
 
@@ -90,7 +91,7 @@ public class QUICLongHeaderPacket<P extends QUICLongHeaderPacket.Payload> {
     QUICLongHeaderPacket(final PacketType packetType, byte typeSpecificBits,
                          QUICVersion version,
                          final ByteBuf destConnId, final ByteBuf sourceConnId,
-                         final P payload) {
+                         final Payload payload) {
 
         this((byte) ((0x80 /* Header Form */ |
                       0x40 /* Fixed Bit */ |
