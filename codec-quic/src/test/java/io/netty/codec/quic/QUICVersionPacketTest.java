@@ -19,6 +19,7 @@ package io.netty.codec.quic;
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.codec.quic.QUICVersionPacket.Payload;
 import org.junit.Test;
 
 import java.nio.charset.Charset;
@@ -33,8 +34,8 @@ public class QUICVersionPacketTest {
         // NOTE: Version packets, even with QUIC v1 may have connection ids larger than 20 bytes per 17.2.1
         final ByteBuf destConnId = Unpooled.copiedBuffer("destination-connection-id".getBytes(Charset.defaultCharset()));
         final ByteBuf sourceConnId = Unpooled.copiedBuffer("source-connection-id".getBytes(Charset.defaultCharset()));
-        QUICVersionPacket packet = QUICVersionPacket.from(destConnId, sourceConnId,
-                                                           Lists.newArrayList(QUICVersion.DRAFT_29, QUICVersion.ONE));
+        final List<QUICVersion> supportedVersions = Lists.newArrayList(QUICVersion.DRAFT_29, QUICVersion.ONE);
+        final QUICVersionPacket packet = QUICVersionPacket.from(destConnId, sourceConnId, supportedVersions);
 
         assertEquals(0x8, packet.header);
         assertEquals(QUICVersion.NEGOTIATING, packet.version);
@@ -44,8 +45,18 @@ public class QUICVersionPacketTest {
         assertEquals(sourceConnId.readableBytes(), packet.sourceConnIdLength);
         assertEquals(sourceConnId.slice(), packet.sourceConnId.slice());
 
-        assertEquals(QUICVersion.DRAFT_29.value, packet.payload.readInt());
-        assertEquals(QUICVersion.ONE.value, packet.payload.readInt());
-        assertFalse(packet.payload.isReadable());
+        assertEquals(supportedVersions, packet.payload.supportedVersions);
+    }
+
+    @Test
+    public void PayloadToByteBuf() {
+        final List<QUICVersion> supportedVersions = Lists.newArrayList(QUICVersion.DRAFT_29, QUICVersion.ONE);
+        Payload payload = new Payload(supportedVersions);
+
+        final ByteBuf buf = payload.toByteBuf();
+
+        assertEquals(QUICVersion.DRAFT_29.value, buf.readInt());
+        assertEquals(QUICVersion.ONE.value, buf.readInt());
+        assertFalse(buf.isReadable());
     }
 }

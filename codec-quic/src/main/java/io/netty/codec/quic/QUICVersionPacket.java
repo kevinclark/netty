@@ -21,20 +21,32 @@ import io.netty.buffer.Unpooled;
 
 import java.util.List;
 
-public class QUICVersionPacket extends QUICLongHeaderPacket {
-    public static QUICVersionPacket from(final ByteBuf destConnId, final ByteBuf sourceConnId,
-                                         final List<QUICVersion> supportedVersions) {
-        final ByteBuf payload = Unpooled.buffer(supportedVersions.size() * 4);
-        for (QUICVersion version : supportedVersions) {
-            payload.writeInt(version.value);
+public class QUICVersionPacket extends QUICLongHeaderPacket<QUICVersionPacket.Payload> {
+    public static class Payload implements QUICLongHeaderPacket.Payload {
+        final List<QUICVersion> supportedVersions;
+
+        Payload(final List<QUICVersion> supportedVersions) {
+            this.supportedVersions = supportedVersions;
         }
 
-        return new QUICVersionPacket(destConnId, sourceConnId, payload);
+        @Override
+        public ByteBuf toByteBuf() {
+            final ByteBuf payload = Unpooled.buffer(supportedVersions.size() * 4);
+            for (QUICVersion version : supportedVersions) {
+                payload.writeInt(version.value);
+            }
+            return payload;
+        }
     }
 
-    private QUICVersionPacket(final ByteBuf destConnId, final ByteBuf sourceConnId,
-                              final ByteBuf supportedVersions) {
+    public static QUICVersionPacket from(final ByteBuf destConnId, final ByteBuf sourceConnId,
+                                         final List<QUICVersion> supportedVersions) {
+        return new QUICVersionPacket(destConnId, sourceConnId, new Payload(supportedVersions));
+    }
+
+    private QUICVersionPacket(final ByteBuf destConnId, final ByteBuf sourceConnId, final Payload payload) {
         super((byte) 0x8 /* Just HeaderForm set */, QUICVersion.NEGOTIATING,
-              destConnId, sourceConnId, supportedVersions);
+              destConnId, sourceConnId,
+              payload);
     }
 }
