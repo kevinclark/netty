@@ -32,17 +32,21 @@ package io.netty.codec.quic;/*
 
 import io.netty.buffer.ByteBuf;
 
-public final class QUICLongHeaderPacket {
-    // 17.2 Long Header Packets - Draft 29
+public class QUICLongHeaderPacket {
+    // 17.2 Long Header Packets - QUIC Draft 29
+    // NOTE: The last 7 bits of header are considered version specific per QUIC-INVARIANTS draft
+    //       Possible we'll want to encapsulate that in some way.
     final byte header;  // Header Form (1) = 1,
                         // Fixed Bit (1) = 1,
                         // Long Packet Type (2),
                         // Type-Specific Bits (4),
-    final int version;  // Version (32),
+    final QUICVersion version;  // Version (32),
     final byte destConnIdLength; // Destination Connection ID Length (8),
     final ByteBuf destConnId;    // Destination Connection ID (0..160),
     final byte sourceConnIdLength; // Source Connection ID Length (8),
     final ByteBuf sourceConnId; // Source Connection ID (0..160),
+
+    final ByteBuf payload;
 
     public enum PacketType {
         Initial((byte) 0x0),
@@ -57,16 +61,10 @@ public final class QUICLongHeaderPacket {
         }
     }
 
-    QUICLongHeaderPacket(final PacketType packetType, byte typeSpecificBits,
-                         int version,
-                         byte destConnIdLength, final ByteBuf destConnId,
-                         byte sourceConnIdLength, final ByteBuf sourceConnId) {
-
-        this.header = (byte) ((0x80 /* Header Form */ |
-                               0x40 /* Fixed Bit */ |
-                               packetType.value /* Long Packet Type */) << 4 |
-                             0x0F & typeSpecificBits) /* Type Specific Bits */;
-
+    protected QUICLongHeaderPacket(byte header, final QUICVersion version,
+                                   final ByteBuf destConnId, final ByteBuf sourceConnId,
+                                   final ByteBuf payload) {
+        this.header = header;
         this.version = version;
 
         // Value MUST NOT exceed 20 in QUIC 1 but servers SHOULD be able to read longer connection IDs
@@ -74,9 +72,32 @@ public final class QUICLongHeaderPacket {
         // Endpoints that receive a version 1 long header with a value larger than 20 MUST drop the packet.
         // TODO: Where to handle version validation? Probably external to the POJO.
         // TODO: Validate that the connIdLength is == readable bytes? Or handle that on write?
-        this.destConnIdLength = destConnIdLength;
+        assert destConnId.readableBytes() < 256;
+        this.destConnIdLength = (byte)destConnId.readableBytes();
         this.destConnId = destConnId.retainedDuplicate();
-        this.sourceConnIdLength = sourceConnIdLength;
+
+        assert sourceConnId.readableBytes() < 256;
+        this.sourceConnIdLength = (byte)sourceConnId.readableBytes();
         this.sourceConnId = sourceConnId.retainedDuplicate();
+
+        this.payload = payload.retainedDuplicate();
+    }
+
+    QUICLongHeaderPacket(final PacketType packetType, byte typeSpecificBits,
+                         QUICVersion version,
+                         final ByteBuf destConnId, final ByteBuf sourceConnId,
+                         final ByteBuf payload) {
+
+        this((byte) ((0x80 /* Header Form */ |
+                      0x40 /* Fixed Bit */ |
+                      packetType.value /* Long Packet Type */) << 4 |
+                     0x0F & typeSpecificBits) /* Type Specific Bits */,
+
+             version,
+             destConnId,
+             sourceConnId,
+
+             payload
+        );
     }
 }
