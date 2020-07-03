@@ -33,10 +33,12 @@ public class QUICInitialPacket extends QUICLongHeaderPacket<QUICInitialPacket.Pa
 
         @Override
         public ByteBuf toByteBuf() {
+            long length = this.number.bytesNeeded() + this.packetPayload.readableBytes();
+
             return Unpooled.wrappedBuffer(Unpooled.copyInt(this.token.readableBytes()),
                                           this.token,
                                           /* Length of remaining data (packet number plus payload) */
-                                          Unpooled.copyInt(this.number.bytesNeeded() + this.packetPayload.readableBytes()),
+                                          QUICIntegerEncodings.encodeVariableLength(length),
                                           this.number.toByteBuf(),
                                           this.packetPayload);
         }

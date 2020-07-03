@@ -16,6 +16,7 @@
 
 package io.netty.codec.quic;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -32,8 +33,8 @@ public class QUICVersionPacketTest {
     @Test
     public void fromSupportedVersions() {
         // NOTE: Version packets, even with QUIC v1 may have connection ids larger than 20 bytes per 17.2.1
-        final ByteBuf destConnId = Unpooled.copiedBuffer("destination-connection-id".getBytes(Charset.defaultCharset()));
-        final ByteBuf sourceConnId = Unpooled.copiedBuffer("source-connection-id".getBytes(Charset.defaultCharset()));
+        final ByteBuf destConnId = Unpooled.copiedBuffer("destination-connection-id".getBytes(Charsets.UTF_8));
+        final ByteBuf sourceConnId = Unpooled.copiedBuffer("source-connection-id".getBytes(Charsets.UTF_8));
         final List<QUICVersion> supportedVersions = Lists.newArrayList(QUICVersion.DRAFT_29, QUICVersion.ONE);
         final QUICVersionPacket packet = QUICVersionPacket.from(destConnId, sourceConnId, supportedVersions);
 

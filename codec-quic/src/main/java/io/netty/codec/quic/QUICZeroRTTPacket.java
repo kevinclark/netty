@@ -17,19 +17,25 @@
 package io.netty.codec.quic;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.codec.quic.QUICLongHeaderPacket.PacketType;
 
 public class QUICZeroRTTPacket extends QUICLongHeaderPacket<QUICZeroRTTPacket.Payload> {
     public static class Payload implements QUICLongHeaderPacket.ToByteBuf {
         public final QUICPacketNumber number;
+        public final ByteBuf payload;
 
-        public Payload(final QUICPacketNumber number) {
+        public Payload(final QUICPacketNumber number, final ByteBuf payload) {
             this.number = number;
+            this.payload = payload;
         }
 
         @Override
         public ByteBuf toByteBuf() {
-            return null;
+            long length = this.number.bytesNeeded() + this.payload.readableBytes();
+            return Unpooled.wrappedBuffer(QUICIntegerEncodings.encodeVariableLength(length),
+                                          this.number.toByteBuf(),
+                                          this.payload);
         }
     }
 
