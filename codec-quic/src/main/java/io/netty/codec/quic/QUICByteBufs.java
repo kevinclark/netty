@@ -19,30 +19,31 @@ package io.netty.codec.quic;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
-public class QUICIntegerEncodings {
-    static ByteBuf encodeVariableLength(long value) {
-        // Only 62 bits allowed
-        assert value < 1L << 62;
-
+public class QUICByteBufs {
+    static ByteBuf encodeVariableLengthNumber(long value) {
         final ByteBuf result = Unpooled.buffer(8);
-
-        if (value >= 1 << 30) { // If it's in the top 34 bits, we need 8 bytes
-            result.writeLong(0xc000000000000000L | 0x3fffffffffffffffL & value);
-        } else if (value >= 1 << 14) { // If it's in the top 32, we need
-            byte[] bytes = { (byte)0x80, 0, 0, 0 };
-            result.writeInt(0x80000000 | 0x3fffffff & (int)value);
-        } else if (value >= 1 << 6) {
-            byte[] bytes = { (byte)0x40, 0 };
-            result.writeShort(0x4000 | 0x3fff & (short)value);
-        } else {
-            result.writeByte((byte)value);
-        }
-
+        writeVariableLengthNumber(result, value);
         return result;
     }
 
-    // TODO: Consumes the decoded bytes. Possilbe this should be renamed read?
-    static long decodeVariableLength(final ByteBuf buf) {
+    static void writeVariableLengthNumber(final ByteBuf buf, long value) {
+        // Only 62 bits allowed max - two are for encoding length
+        assert value < 1L << 62;
+
+        if (value >= 1 << 30) { // If it's in the top 34 bits, we need 8 bytes
+            buf.writeLong(0xc000000000000000L | 0x3fffffffffffffffL & value);
+        } else if (value >= 1 << 14) { // If it's in the top 32, we need
+            byte[] bytes = { (byte)0x80, 0, 0, 0 };
+            buf.writeInt(0x80000000 | 0x3fffffff & (int)value);
+        } else if (value >= 1 << 6) {
+            byte[] bytes = { (byte)0x40, 0 };
+            buf.writeShort(0x4000 | 0x3fff & (short)value);
+        } else {
+            buf.writeByte((byte)value);
+        }
+    }
+
+    static long readVariableLengthNumber(final ByteBuf buf) {
         ByteBuf conversionBuf = Unpooled.buffer(8);
         byte firstByte = buf.readByte();
 

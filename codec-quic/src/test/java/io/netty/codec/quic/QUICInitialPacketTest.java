@@ -22,8 +22,6 @@ import io.netty.buffer.Unpooled;
 import io.netty.codec.quic.QUICInitialPacket.Payload;
 import org.junit.Test;
 
-import java.nio.charset.Charset;
-
 import static org.junit.Assert.*;
 
 public class QUICInitialPacketTest {
@@ -36,7 +34,7 @@ public class QUICInitialPacketTest {
         assertEquals(5, buf.readInt()); // Tok length
         assertEquals(tok.slice(), buf.readBytes(5)); // Then tok
         // Then remaining length, which is the packet number length plus the length of payloadBuf
-        assertEquals(4 + payloadBuf.readableBytes(), QUICIntegerEncodings.decodeVariableLength(buf));
+        assertEquals(4 + payloadBuf.readableBytes(), QUICByteBufs.readVariableLengthNumber(buf));
         assertEquals(1 << 25, buf.readInt());
         assertEquals(payloadBuf, buf.slice());
     }

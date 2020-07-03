@@ -38,7 +38,7 @@ public class QUICInitialPacket extends QUICLongHeaderPacket<QUICInitialPacket.Pa
             return Unpooled.wrappedBuffer(Unpooled.copyInt(this.token.readableBytes()),
                                           this.token,
                                           /* Length of remaining data (packet number plus payload) */
-                                          QUICIntegerEncodings.encodeVariableLength(length),
+                                          QUICByteBufs.encodeVariableLengthNumber(length),
                                           this.number.toByteBuf(),
                                           this.packetPayload);
         }

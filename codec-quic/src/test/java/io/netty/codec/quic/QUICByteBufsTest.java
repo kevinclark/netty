@@ -22,11 +22,11 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class QUICIntegerEncodingsTest {
+public class QUICByteBufsTest {
 
     @Test
     public void encodeVariableLength8Bytes() {
-        final ByteBuf encoded = QUICIntegerEncodings.encodeVariableLength(151288809941952652L);
+        final ByteBuf encoded = QUICByteBufs.encodeVariableLengthNumber(151288809941952652L);
 
         assertEquals(0xc2197c5eff14e88cL, encoded.readLong());
     }
@@ -35,41 +35,41 @@ public class QUICIntegerEncodingsTest {
     public void variableLengthDecodeEightBytes() {
         final ByteBuf buf = Unpooled.copyLong(0xc2197c5eff14e88cL);
 
-        assertEquals(151288809941952652L, QUICIntegerEncodings.decodeVariableLength(buf));
+        assertEquals(151288809941952652L, QUICByteBufs.readVariableLengthNumber(buf));
     }
 
     @Test
     public void encodeVariableLengthFourBytes() {
-        assertEquals(0xbfffffff, QUICIntegerEncodings.encodeVariableLength(1073741823).readInt());
+        assertEquals(0xbfffffff, QUICByteBufs.encodeVariableLengthNumber(1073741823).readInt());
     }
 
     @Test
     public void variableLengthDecodeFourBytes() {
-        assertEquals(1073741823, QUICIntegerEncodings.decodeVariableLength(Unpooled.copyInt(0xbfffffff)));
+        assertEquals(1073741823, QUICByteBufs.readVariableLengthNumber(Unpooled.copyInt(0xbfffffff)));
     }
 
     @Test
     public void encodeVariableLengthTwoBytes() {
-        assertEquals(0x7fff, QUICIntegerEncodings.encodeVariableLength(16383).readShort());
+        assertEquals(0x7fff, QUICByteBufs.encodeVariableLengthNumber(16383).readShort());
     }
 
     @Test
     public void variableLengthDecodeWithTwoBytes() {
-        assertEquals(37, QUICIntegerEncodings.decodeVariableLength(Unpooled.copyShort(0x4025)));
+        assertEquals(37, QUICByteBufs.readVariableLengthNumber(Unpooled.copyShort(0x4025)));
 
         assertEquals(16383,
-                     QUICIntegerEncodings.decodeVariableLength(Unpooled.wrappedBuffer(new byte[]{ 0x7f, (byte)0xff })));
+                     QUICByteBufs.readVariableLengthNumber(Unpooled.wrappedBuffer(new byte[]{ 0x7f, (byte)0xff })));
     }
 
     @Test
     public void encodeVariableLengthOneBytes() {
-        assertEquals(0x25, QUICIntegerEncodings.encodeVariableLength(37).readByte());
+        assertEquals(0x25, QUICByteBufs.encodeVariableLengthNumber(37).readByte());
     }
 
     @Test
     public void variableLengthDecodeWithOneByte() {
         final ByteBuf buf = Unpooled.wrappedBuffer(new byte[]{ 0x25 });
-        final long val = QUICIntegerEncodings.decodeVariableLength(buf);
+        final long val = QUICByteBufs.readVariableLengthNumber(buf);
 
         assertEquals(37, val);
     }

@@ -21,8 +21,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.junit.Test;
 
-import java.nio.charset.Charset;
-
 import static org.junit.Assert.*;
 
 public class QUICZeroRTTPacketTest {
@@ -31,7 +29,7 @@ public class QUICZeroRTTPacketTest {
         final ByteBuf payload = Unpooled.wrappedBuffer("payload".getBytes(Charsets.UTF_8));
         final ByteBuf buf = new QUICZeroRTTPacket.Payload(new QUICPacketNumber(5), payload).toByteBuf();
 
-        assertEquals(1 + payload.readableBytes(), QUICIntegerEncodings.decodeVariableLength(buf));
+        assertEquals(1 + payload.readableBytes(), QUICByteBufs.readVariableLengthNumber(buf));
         assertEquals(5, buf.readByte());
         assertEquals(payload.slice(), buf.readBytes(payload.readableBytes()));
     }
