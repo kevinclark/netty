@@ -16,23 +16,14 @@
 
 package io.netty.codec.quic.packet;
 
-import com.google.common.base.Charsets;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.codec.quic.util.QUICByteBufs;
-import org.junit.Test;
+import io.netty.codec.quic.QUICVersion;
 
-import static org.junit.Assert.*;
-
-public class QUICZeroRTTPacketTest {
-    @Test
-    public void payloadToByteBuf() {
-        final ByteBuf payload = Unpooled.wrappedBuffer("payload".getBytes(Charsets.UTF_8));
-        final ByteBuf buf = new QUICNumberedPacketPayload(new QUICPacketNumber(5), payload).toByteBuf();
-
-        assertEquals(1 + payload.readableBytes(), QUICByteBufs.readVariableLengthNumber(buf));
-        assertEquals(5, buf.readByte());
-        assertEquals(payload.slice(), buf.readBytes(payload.readableBytes()));
+public class QUICHandshakePacket extends QUICLongHeaderPacket<QUICNumberedPacketPayload> {
+    public QUICHandshakePacket(final QUICVersion version,
+                               final ByteBuf destConnId, final ByteBuf sourceConnId,
+                               final QUICNumberedPacketPayload payload) {
+        super(PacketType.Handshake, payload.number.encodedLength, version,
+              destConnId, sourceConnId, payload);
     }
-
 }

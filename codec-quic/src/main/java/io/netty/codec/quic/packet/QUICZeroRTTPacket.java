@@ -17,33 +17,13 @@
 package io.netty.codec.quic.packet;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.codec.quic.util.QUICByteBufs;
 import io.netty.codec.quic.QUICVersion;
-import io.netty.codec.quic.packet.QUICZeroRTTPacket.Payload;
 
-public class QUICZeroRTTPacket extends QUICLongHeaderPacket<Payload> {
-    public static class Payload implements QUICLongHeaderPacket.ToByteBuf {
-        public final QUICPacketNumber number;
-        public final ByteBuf payload;
-
-        public Payload(final QUICPacketNumber number, final ByteBuf payload) {
-            this.number = number;
-            this.payload = payload;
-        }
-
-        @Override
-        public ByteBuf toByteBuf() {
-            long length = this.number.bytesNeeded() + this.payload.readableBytes();
-            return Unpooled.wrappedBuffer(QUICByteBufs.encodeVariableLengthNumber(length),
-                                          this.number.toByteBuf(),
-                                          this.payload);
-        }
-    }
+public class QUICZeroRTTPacket extends QUICLongHeaderPacket<QUICNumberedPacketPayload> {
 
     public QUICZeroRTTPacket(final QUICVersion version,
                              final ByteBuf destConnId, final ByteBuf sourceConnId,
-                             final Payload payload) {
+                             final QUICNumberedPacketPayload payload) {
         super(PacketType.ZeroRTT, payload.number.encodedLength, version,
               destConnId, sourceConnId, payload);
     }

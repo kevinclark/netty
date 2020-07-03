@@ -23,27 +23,19 @@ import io.netty.codec.quic.QUICVersion;
 import io.netty.codec.quic.packet.QUICInitialPacket.Payload;
 
 public class QUICInitialPacket extends QUICLongHeaderPacket<Payload> {
-    public static class Payload implements QUICLongHeaderPacket.ToByteBuf {
+    public static class Payload extends QUICNumberedPacketPayload {
         public final ByteBuf token;
-        public final QUICPacketNumber number;
-        public final ByteBuf packetPayload;
 
         public Payload(final ByteBuf token, final QUICPacketNumber number, final ByteBuf packetPayload) {
+            super(number, packetPayload);
             this.token = token;
-            this.number = number;
-            this.packetPayload = packetPayload;
         }
 
         @Override
         public ByteBuf toByteBuf() {
-            long length = this.number.bytesNeeded() + this.packetPayload.readableBytes();
-
             return Unpooled.wrappedBuffer(Unpooled.copyInt(this.token.readableBytes()),
                                           this.token,
-                                          /* Length of remaining data (packet number plus payload) */
-                                          QUICByteBufs.encodeVariableLengthNumber(length),
-                                          this.number.toByteBuf(),
-                                          this.packetPayload);
+                                          super.toByteBuf());
         }
     }
 
