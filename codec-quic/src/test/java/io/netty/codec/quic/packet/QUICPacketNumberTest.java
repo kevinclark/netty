@@ -14,8 +14,9 @@
  * under the License.
  */
 
-package io.netty.codec.quic;
+package io.netty.codec.quic.packet;
 
+import io.netty.codec.quic.packet.QUICPacketNumber;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

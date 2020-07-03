@@ -14,28 +14,27 @@
  * under the License.
  */
 
-package io.netty.codec.quic;
+package io.netty.codec.quic.packet;
 
 import com.google.common.base.Charsets;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.codec.quic.QUICInitialPacket.Payload;
+import io.netty.codec.quic.packet.QUICPacketNumber;
+import io.netty.codec.quic.packet.QUICZeroRTTPacket;
+import io.netty.codec.quic.util.QUICByteBufs;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class QUICInitialPacketTest {
+public class QUICZeroRTTPacketTest {
     @Test
     public void payloadToByteBuf() {
-        final ByteBuf tok = Unpooled.wrappedBuffer("token".getBytes(Charsets.UTF_8));
-        final ByteBuf payloadBuf = Unpooled.wrappedBuffer("It's a payload!".getBytes(Charsets.UTF_8));
+        final ByteBuf payload = Unpooled.wrappedBuffer("payload".getBytes(Charsets.UTF_8));
+        final ByteBuf buf = new QUICZeroRTTPacket.Payload(new QUICPacketNumber(5), payload).toByteBuf();
 
-        final ByteBuf buf = new Payload(tok, new QUICPacketNumber(1 << 25), payloadBuf).toByteBuf();
-        assertEquals(5, buf.readInt()); // Tok length
-        assertEquals(tok.slice(), buf.readBytes(5)); // Then tok
-        // Then remaining length, which is the packet number length plus the length of payloadBuf
-        assertEquals(4 + payloadBuf.readableBytes(), QUICByteBufs.readVariableLengthNumber(buf));
-        assertEquals(1 << 25, buf.readInt());
-        assertEquals(payloadBuf, buf.slice());
+        assertEquals(1 + payload.readableBytes(), QUICByteBufs.readVariableLengthNumber(buf));
+        assertEquals(5, buf.readByte());
+        assertEquals(payload.slice(), buf.readBytes(payload.readableBytes()));
     }
+
 }

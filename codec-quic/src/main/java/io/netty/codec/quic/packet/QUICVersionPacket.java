@@ -14,14 +14,16 @@
  * under the License.
  */
 
-package io.netty.codec.quic;
+package io.netty.codec.quic.packet;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.codec.quic.QUICVersion;
+import io.netty.codec.quic.packet.QUICVersionPacket.Payload;
 
 import java.util.List;
 
-public class QUICVersionPacket extends QUICLongHeaderPacket<QUICVersionPacket.Payload> {
+public class QUICVersionPacket extends QUICLongHeaderPacket<Payload> {
     public static class Payload implements QUICLongHeaderPacket.ToByteBuf {
         final List<QUICVersion> supportedVersions;
 

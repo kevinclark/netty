@@ -14,16 +14,17 @@
  * under the License.
  */
 
-package io.netty.codec.quic;
+package io.netty.codec.quic.packet;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.codec.quic.QUICVersionPacket.Payload;
+import io.netty.codec.quic.QUICVersion;
+import io.netty.codec.quic.packet.QUICVersionPacket;
+import io.netty.codec.quic.packet.QUICVersionPacket.Payload;
 import org.junit.Test;
 
-import java.nio.charset.Charset;
 import java.util.List;
 
 import static org.junit.Assert.*;

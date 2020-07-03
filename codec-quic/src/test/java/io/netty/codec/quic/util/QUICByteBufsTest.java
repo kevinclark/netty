@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package io.netty.codec.quic;
+package io.netty.codec.quic.util;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

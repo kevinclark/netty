@@ -14,19 +14,19 @@
  * under the License.
  */
 
-package io.netty.codec.quic;
+package io.netty.codec.quic.util;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 public class QUICByteBufs {
-    static ByteBuf encodeVariableLengthNumber(long value) {
+    static public ByteBuf encodeVariableLengthNumber(long value) {
         final ByteBuf result = Unpooled.buffer(8);
         writeVariableLengthNumber(result, value);
         return result;
     }
 
-    static void writeVariableLengthNumber(final ByteBuf buf, long value) {
+    static public void writeVariableLengthNumber(final ByteBuf buf, long value) {
         // Only 62 bits allowed max - two are for encoding length
         assert value < 1L << 62;
 
@@ -43,7 +43,7 @@ public class QUICByteBufs {
         }
     }
 
-    static long readVariableLengthNumber(final ByteBuf buf) {
+    static public long readVariableLengthNumber(final ByteBuf buf) {
         ByteBuf conversionBuf = Unpooled.buffer(8);
         byte firstByte = buf.readByte();
 

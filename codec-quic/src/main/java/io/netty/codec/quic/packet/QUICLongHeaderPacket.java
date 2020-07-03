@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package io.netty.codec.quic;/*
+package io.netty.codec.quic.packet;/*
  * Copyright 2020 The Netty Project
  *
  * The Netty Project licenses this file to you under the Apache License,
@@ -31,7 +31,8 @@ package io.netty.codec.quic;/*
  */
 
 import io.netty.buffer.ByteBuf;
-import io.netty.codec.quic.QUICLongHeaderPacket.ToByteBuf;
+import io.netty.codec.quic.QUICVersion;
+import io.netty.codec.quic.packet.QUICLongHeaderPacket.ToByteBuf;
 
 public class QUICLongHeaderPacket<Payload extends ToByteBuf> {
     // 17.2 Long Header Packets - QUIC Draft 29

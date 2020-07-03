@@ -14,11 +14,11 @@
  * under the License.
  */
 
-package io.netty.codec.quic;
+package io.netty.codec.quic.packet;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.codec.quic.QUICLongHeaderPacket.ToByteBuf;
+import io.netty.codec.quic.packet.QUICLongHeaderPacket.ToByteBuf;
 
 public final class QUICPacketNumber implements ToByteBuf {
     public final int number;

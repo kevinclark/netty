@@ -14,12 +14,15 @@
  * under the License.
  */
 
-package io.netty.codec.quic;
+package io.netty.codec.quic.packet;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.codec.quic.util.QUICByteBufs;
+import io.netty.codec.quic.QUICVersion;
+import io.netty.codec.quic.packet.QUICInitialPacket.Payload;
 
-public class QUICInitialPacket extends QUICLongHeaderPacket<QUICInitialPacket.Payload> {
+public class QUICInitialPacket extends QUICLongHeaderPacket<Payload> {
     public static class Payload implements QUICLongHeaderPacket.ToByteBuf {
         public final ByteBuf token;
         public final QUICPacketNumber number;
