@@ -26,7 +26,7 @@ public class QUICNumberedPacketPayload implements QUICLongHeaderPacket.ToByteBuf
 
     public QUICNumberedPacketPayload(final QUICPacketNumber number, final ByteBuf payload) {
         this.number = number;
-        this.payload = payload;
+        this.payload = payload.retainedDuplicate();
     }
 
     @Override

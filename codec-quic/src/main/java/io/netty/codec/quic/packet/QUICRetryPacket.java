@@ -19,31 +19,29 @@ package io.netty.codec.quic.packet;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.codec.quic.QUICVersion;
-import io.netty.codec.quic.packet.QUICInitialPacket.Payload;
+import io.netty.codec.quic.packet.QUICRetryPacket.Payload;
 
-public class QUICInitialPacket extends QUICLongHeaderPacket<Payload> {
-    public static class Payload extends QUICNumberedPacketPayload {
+public class QUICRetryPacket extends QUICLongHeaderPacket<Payload> {
+    public static class Payload implements ToByteBuf {
         public final ByteBuf token;
+        public final byte[] integrityTag;
 
-        public Payload(final ByteBuf token, final QUICPacketNumber number, final ByteBuf packetPayload) {
-            super(number, packetPayload);
+        public Payload(final ByteBuf token, final byte[] integrityTag) {
             this.token = token.retainedDuplicate();
+            this.integrityTag = integrityTag;
         }
 
         @Override
         public ByteBuf toByteBuf() {
-            return Unpooled.wrappedBuffer(Unpooled.copyInt(this.token.readableBytes()),
-                                          this.token,
-                                          super.toByteBuf());
+            return Unpooled.wrappedBuffer(this.token,
+                                          Unpooled.wrappedBuffer(this.integrityTag));
         }
     }
 
-    public QUICInitialPacket(final QUICVersion version,
-                             final ByteBuf destConnId, final ByteBuf sourceConnId,
-                             final Payload payload) {
-        super(PacketType.Initial,
-              /* Reserved Bits (2), Packet Number Length (2)*/
-              payload.number.encodedLength, version,
+    public QUICRetryPacket(final QUICVersion version,
+                           final ByteBuf destConnId, final ByteBuf sourceConnId,
+                           final Payload payload) {
+        super(PacketType.Retry, (byte)0x0 /* Unused */, version,
               destConnId, sourceConnId, payload);
     }
 }
