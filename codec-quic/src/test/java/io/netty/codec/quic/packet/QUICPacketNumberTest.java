@@ -30,9 +30,21 @@ public class QUICPacketNumberTest {
     }
 
     @Test
+    public void bytesNeededWith1ByteValueIs1() {
+        assertEquals(1, new QUICPacketNumber(1).bytesNeeded());
+        assertEquals(1, new QUICPacketNumber(1 << 7).bytesNeeded());
+    }
+
+    @Test
     public void encodedLengthWith2ByteValueIs1() {
         assertEquals(1, new QUICPacketNumber(1 << 8).encodedLength);
         assertEquals(1, new QUICPacketNumber(1 << 15).encodedLength);
+    }
+
+    @Test
+    public void bytesNeededWith2ByteValueIs2() {
+        assertEquals(2, new QUICPacketNumber(1 << 8).bytesNeeded());
+        assertEquals(2, new QUICPacketNumber(1 << 15).bytesNeeded());
     }
 
     @Test
@@ -42,7 +54,19 @@ public class QUICPacketNumberTest {
     }
 
     @Test
+    public void bytesNeededWith3ByteValueIs3() {
+        assertEquals(3, new QUICPacketNumber(1 << 16).bytesNeeded());
+        assertEquals(3, new QUICPacketNumber(1 << 23).bytesNeeded());
+    }
+
+    @Test
     public void encodedLengthWith4ByteValueIs3() {
         assertEquals(3, new QUICPacketNumber(1 << 24).encodedLength);
     }
+
+    @Test
+    public void bytesNeededWith4ByteValueIs4() {
+        assertEquals(4, new QUICPacketNumber(1 << 24).bytesNeeded());
+    }
+
 }
