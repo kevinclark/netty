@@ -19,10 +19,10 @@ package io.netty.codec.quic.packet;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.codec.quic.QUICVersion;
-import io.netty.codec.quic.packet.QUICRetryPacket.Payload;
+import io.netty.codec.quic.packet.RetryPacket.Payload;
 import io.netty.codec.quic.util.ToByteBuf;
 
-public class QUICRetryPacket extends QUICLongHeaderPacket<Payload> {
+public class RetryPacket extends LongHeaderPacket<Payload> {
     public static class Payload implements ToByteBuf {
         public final ByteBuf token;
         public final byte[] integrityTag;
@@ -39,9 +39,9 @@ public class QUICRetryPacket extends QUICLongHeaderPacket<Payload> {
         }
     }
 
-    public QUICRetryPacket(final QUICVersion version,
-                           final ByteBuf destConnId, final ByteBuf sourceConnId,
-                           final Payload payload) {
+    public RetryPacket(final QUICVersion version,
+                       final ByteBuf destConnId, final ByteBuf sourceConnId,
+                       final Payload payload) {
         super(PacketType.Retry, (byte)0x0 /* Unused */, version,
               destConnId, sourceConnId, payload);
     }

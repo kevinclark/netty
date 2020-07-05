@@ -19,10 +19,10 @@ package io.netty.codec.quic.packet;
 import io.netty.buffer.ByteBuf;
 import io.netty.codec.quic.QUICVersion;
 
-public class QUICHandshakePacket extends QUICLongHeaderPacket<QUICNumberedPacketPayload> {
-    public QUICHandshakePacket(final QUICVersion version,
-                               final ByteBuf destConnId, final ByteBuf sourceConnId,
-                               final QUICNumberedPacketPayload payload) {
+public class HandshakePacket extends LongHeaderPacket<NumberedPacketPayload> {
+    public HandshakePacket(final QUICVersion version,
+                           final ByteBuf destConnId, final ByteBuf sourceConnId,
+                           final NumberedPacketPayload payload) {
         super(PacketType.Handshake, payload.number.encodedLength, version,
               destConnId, sourceConnId, payload);
     }

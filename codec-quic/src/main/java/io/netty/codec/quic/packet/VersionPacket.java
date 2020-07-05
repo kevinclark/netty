@@ -19,12 +19,12 @@ package io.netty.codec.quic.packet;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.codec.quic.QUICVersion;
-import io.netty.codec.quic.packet.QUICVersionPacket.Payload;
+import io.netty.codec.quic.packet.VersionPacket.Payload;
 import io.netty.codec.quic.util.ToByteBuf;
 
 import java.util.List;
 
-public class QUICVersionPacket extends QUICLongHeaderPacket<Payload> {
+public class VersionPacket extends LongHeaderPacket<Payload> {
     public static class Payload implements ToByteBuf {
         final List<QUICVersion> supportedVersions;
 
@@ -42,12 +42,12 @@ public class QUICVersionPacket extends QUICLongHeaderPacket<Payload> {
         }
     }
 
-    public static QUICVersionPacket from(final ByteBuf destConnId, final ByteBuf sourceConnId,
-                                         final List<QUICVersion> supportedVersions) {
-        return new QUICVersionPacket(destConnId, sourceConnId, new Payload(supportedVersions));
+    public static VersionPacket from(final ByteBuf destConnId, final ByteBuf sourceConnId,
+                                     final List<QUICVersion> supportedVersions) {
+        return new VersionPacket(destConnId, sourceConnId, new Payload(supportedVersions));
     }
 
-    private QUICVersionPacket(final ByteBuf destConnId, final ByteBuf sourceConnId, final Payload payload) {
+    private VersionPacket(final ByteBuf destConnId, final ByteBuf sourceConnId, final Payload payload) {
         super((byte) (0x8 | 0x4) /* Draft 29 says just Header Form MUST be set, but SHOULD also set 0x4 */,
               QUICVersion.NEGOTIATING,
               destConnId, sourceConnId,

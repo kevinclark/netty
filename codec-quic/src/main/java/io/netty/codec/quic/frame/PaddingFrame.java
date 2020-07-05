@@ -14,27 +14,20 @@
  * under the License.
  */
 
-package io.netty.codec.quic.packet;
+package io.netty.codec.quic.frame;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.codec.quic.util.QUICByteBufs;
 import io.netty.codec.quic.util.ToByteBuf;
 
-public class QUICNumberedPacketPayload implements ToByteBuf {
-    public final QUICPacketNumber number;
-    public final ByteBuf payload;
-
-    public QUICNumberedPacketPayload(final QUICPacketNumber number, final ByteBuf payload) {
-        this.number = number;
-        this.payload = payload.retainedDuplicate();
-    }
+public class PaddingFrame implements ToByteBuf {
+    public final int TYPE = 0x0;
 
     @Override
     public ByteBuf toByteBuf() {
-        long length = this.number.bytesNeeded() + this.payload.readableBytes();
-        return Unpooled.wrappedBuffer(QUICByteBufs.encodeVariableLengthNumber(length),
-                                      this.number.toByteBuf(),
-                                      this.payload);
+        ByteBuf buf = Unpooled.buffer(1);
+        QUICByteBufs.writeVariableLengthNumber(buf, TYPE);
+        return buf;
     }
 }

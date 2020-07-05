@@ -19,20 +19,26 @@ package io.netty.codec.quic.packet;
 import com.google.common.base.Charsets;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.codec.quic.util.QUICByteBufs;
+import io.netty.codec.quic.packet.RetryPacket.Payload;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class QUICZeroRTTPacketTest {
+public class RetryPacketTest {
+
     @Test
     public void payloadToByteBuf() {
-        final ByteBuf payload = Unpooled.wrappedBuffer("payload".getBytes(Charsets.UTF_8));
-        final ByteBuf buf = new QUICNumberedPacketPayload(new QUICPacketNumber(5), payload).toByteBuf();
+        final ByteBuf tok = Unpooled.wrappedBuffer("retry-token".getBytes(Charsets.UTF_8));
+        byte[] integrityTag = new byte[128];
+        integrityTag[0] = 'b';
+        integrityTag[127] = 'e';
 
-        assertEquals(1 + payload.readableBytes(), QUICByteBufs.readVariableLengthNumber(buf));
-        assertEquals(5, buf.readByte());
-        assertEquals(payload.slice(), buf.readBytes(payload.readableBytes()));
+        final ByteBuf actual = new Payload(tok, integrityTag).toByteBuf();
+        int tokenLen = actual.readableBytes() - 128;
+        final ByteBuf token = actual.readBytes(tokenLen);
+        assertEquals(tok, token);
+
+        final ByteBuf actualIntegrityTag = actual.readBytes(128);
+        assertEquals(Unpooled.wrappedBuffer(integrityTag), actualIntegrityTag);
     }
-
 }

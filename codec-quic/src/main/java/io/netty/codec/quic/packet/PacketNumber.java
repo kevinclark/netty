@@ -67,11 +67,11 @@ import io.netty.codec.quic.util.ToByteBuf;
  *  Example pseudo-code for packet number decoding can be found in
  *  Appendix A.
  */
-public final class QUICPacketNumber implements ToByteBuf {
+public final class PacketNumber implements ToByteBuf {
     public final int number;
     public final byte encodedLength;
 
-    public QUICPacketNumber(int number) {
+    public PacketNumber(int number) {
         this.number = number;
         this.encodedLength = encodedLength(number);
     }

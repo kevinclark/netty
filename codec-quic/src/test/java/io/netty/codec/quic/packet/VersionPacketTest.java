@@ -21,15 +21,14 @@ import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.codec.quic.QUICVersion;
-import io.netty.codec.quic.packet.QUICVersionPacket;
-import io.netty.codec.quic.packet.QUICVersionPacket.Payload;
+import io.netty.codec.quic.packet.VersionPacket.Payload;
 import org.junit.Test;
 
 import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class QUICVersionPacketTest {
+public class VersionPacketTest {
 
     @Test
     public void fromSupportedVersions() {
@@ -37,7 +36,7 @@ public class QUICVersionPacketTest {
         final ByteBuf destConnId = Unpooled.copiedBuffer("destination-connection-id".getBytes(Charsets.UTF_8));
         final ByteBuf sourceConnId = Unpooled.copiedBuffer("source-connection-id".getBytes(Charsets.UTF_8));
         final List<QUICVersion> supportedVersions = Lists.newArrayList(QUICVersion.DRAFT_29, QUICVersion.ONE);
-        final QUICVersionPacket packet = QUICVersionPacket.from(destConnId, sourceConnId, supportedVersions);
+        final VersionPacket packet = VersionPacket.from(destConnId, sourceConnId, supportedVersions);
 
         assertEquals(0xC, packet.header); // 0x8 and 0x4 set
         assertEquals(QUICVersion.NEGOTIATING, packet.version);

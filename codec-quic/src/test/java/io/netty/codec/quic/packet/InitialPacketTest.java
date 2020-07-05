@@ -19,20 +19,19 @@ package io.netty.codec.quic.packet;
 import com.google.common.base.Charsets;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.codec.quic.packet.QUICInitialPacket.Payload;
-import io.netty.codec.quic.packet.QUICPacketNumber;
+import io.netty.codec.quic.packet.InitialPacket.Payload;
 import io.netty.codec.quic.util.QUICByteBufs;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class QUICInitialPacketTest {
+public class InitialPacketTest {
     @Test
     public void payloadToByteBuf() {
         final ByteBuf tok = Unpooled.wrappedBuffer("token".getBytes(Charsets.UTF_8));
         final ByteBuf payloadBuf = Unpooled.wrappedBuffer("It's a payload!".getBytes(Charsets.UTF_8));
 
-        final ByteBuf buf = new Payload(tok, new QUICPacketNumber(1 << 25), payloadBuf).toByteBuf();
+        final ByteBuf buf = new Payload(tok, new PacketNumber(1 << 25), payloadBuf).toByteBuf();
         assertEquals(5, buf.readInt()); // Tok length
         assertEquals(tok.slice(), buf.readBytes(5)); // Then tok
         // Then remaining length, which is the packet number length plus the length of payloadBuf

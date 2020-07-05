@@ -14,20 +14,17 @@
  * under the License.
  */
 
-package io.netty.codec.quic.frame;
+package io.netty.codec.quic.packet;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.codec.quic.util.QUICByteBufs;
-import io.netty.codec.quic.util.ToByteBuf;
+import io.netty.codec.quic.QUICVersion;
 
-public class QUICPaddingFrame implements ToByteBuf {
-    public final int TYPE = 0x0;
+public class ZeroRTTPacket extends LongHeaderPacket<NumberedPacketPayload> {
 
-    @Override
-    public ByteBuf toByteBuf() {
-        ByteBuf buf = Unpooled.buffer(1);
-        QUICByteBufs.writeVariableLengthNumber(buf, TYPE);
-        return buf;
+    public ZeroRTTPacket(final QUICVersion version,
+                         final ByteBuf destConnId, final ByteBuf sourceConnId,
+                         final NumberedPacketPayload payload) {
+        super(PacketType.ZeroRTT, payload.number.encodedLength, version,
+              destConnId, sourceConnId, payload);
     }
 }

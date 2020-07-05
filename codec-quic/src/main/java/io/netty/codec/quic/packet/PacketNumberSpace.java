@@ -22,11 +22,11 @@ import com.google.common.collect.TreeRangeSet;
 
 import java.util.Optional;
 
-public class QUICPacketNumberSpace {
+public class PacketNumberSpace {
     private long nextPacketNumber = 0;
     private RangeSet<Long> ackRanges;
 
-    public QUICPacketNumberSpace() {
+    public PacketNumberSpace() {
         this.ackRanges = TreeRangeSet.create();
     }
 

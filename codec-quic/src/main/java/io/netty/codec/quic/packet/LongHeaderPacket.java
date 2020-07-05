@@ -34,7 +34,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.codec.quic.QUICVersion;
 import io.netty.codec.quic.util.ToByteBuf;
 
-public class QUICLongHeaderPacket<Payload extends ToByteBuf> {
+public class LongHeaderPacket<Payload extends ToByteBuf> {
     // 17.2 Long Header Packets - QUIC Draft 29
     // NOTE: The last 7 bits of header are considered version specific per QUIC-INVARIANTS draft
     //       Possible we'll want to encapsulate that in some way.
@@ -65,9 +65,9 @@ public class QUICLongHeaderPacket<Payload extends ToByteBuf> {
         }
     }
 
-    protected QUICLongHeaderPacket(byte header, final QUICVersion version,
-                                   final ByteBuf destConnId, final ByteBuf sourceConnId,
-                                   final Payload payload) {
+    protected LongHeaderPacket(byte header, final QUICVersion version,
+                               final ByteBuf destConnId, final ByteBuf sourceConnId,
+                               final Payload payload) {
         this.header = header;
         this.version = version;
 
@@ -87,10 +87,10 @@ public class QUICLongHeaderPacket<Payload extends ToByteBuf> {
         this.payload = payload;
     }
 
-    QUICLongHeaderPacket(final PacketType packetType, byte typeSpecificBits,
-                         QUICVersion version,
-                         final ByteBuf destConnId, final ByteBuf sourceConnId,
-                         final Payload payload) {
+    LongHeaderPacket(final PacketType packetType, byte typeSpecificBits,
+                     QUICVersion version,
+                     final ByteBuf destConnId, final ByteBuf sourceConnId,
+                     final Payload payload) {
 
         this((byte) ((0x80 /* Header Form */ |
                       0x40 /* Fixed Bit */ |

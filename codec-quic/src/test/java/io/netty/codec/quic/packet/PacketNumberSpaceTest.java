@@ -23,10 +23,10 @@ import java.util.Optional;
 
 import static org.junit.Assert.*;
 
-public class QUICPacketNumberSpaceTest {
+public class PacketNumberSpaceTest {
     @Test
     public void getLargestPacketNumberReceived() {
-        QUICPacketNumberSpace space = new QUICPacketNumberSpace();
+        PacketNumberSpace space = new PacketNumberSpace();
         assertEquals(Optional.empty(), space.getLargestPacketNumberReceived());
 
         space.ack(Range.closed(0L, 0L));

@@ -19,13 +19,13 @@ package io.netty.codec.quic.packet;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.codec.quic.QUICVersion;
-import io.netty.codec.quic.packet.QUICInitialPacket.Payload;
+import io.netty.codec.quic.packet.InitialPacket.Payload;
 
-public class QUICInitialPacket extends QUICLongHeaderPacket<Payload> {
-    public static class Payload extends QUICNumberedPacketPayload {
+public class InitialPacket extends LongHeaderPacket<Payload> {
+    public static class Payload extends NumberedPacketPayload {
         public final ByteBuf token;
 
-        public Payload(final ByteBuf token, final QUICPacketNumber number, final ByteBuf packetPayload) {
+        public Payload(final ByteBuf token, final PacketNumber number, final ByteBuf packetPayload) {
             super(number, packetPayload);
             this.token = token.retainedDuplicate();
         }
@@ -38,9 +38,9 @@ public class QUICInitialPacket extends QUICLongHeaderPacket<Payload> {
         }
     }
 
-    public QUICInitialPacket(final QUICVersion version,
-                             final ByteBuf destConnId, final ByteBuf sourceConnId,
-                             final Payload payload) {
+    public InitialPacket(final QUICVersion version,
+                         final ByteBuf destConnId, final ByteBuf sourceConnId,
+                         final Payload payload) {
         super(PacketType.Initial,
               /* Reserved Bits (2), Packet Number Length (2)*/
               payload.number.encodedLength, version,
