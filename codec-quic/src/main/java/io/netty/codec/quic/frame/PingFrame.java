@@ -20,31 +20,33 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.codec.quic.util.QUICByteBufs;
 
-// A singleton - PaddingFrames have no data but type.
-public class PaddingFrame extends Frame {
-    public static final long TYPE = 0x0;
-    private static PaddingFrame INSTANCE = new PaddingFrame(); // No reason to have more
+// A singleton - PingFrames have no data but type.
+public class PingFrame extends Frame {
+    public static final long TYPE = 0x1;
+    private static PingFrame INSTANCE = new PingFrame(); // No reason to have more
 
-    public static PaddingFrame create() {
+    public static PingFrame create() {
         return INSTANCE;
     }
 
-    private PaddingFrame() {};
+    private PingFrame() {};
 
     @Override
     public ByteBuf toByteBuf() {
         ByteBuf buf = Unpooled.buffer(1);
-        QUICByteBufs.writeVariableLengthNumber(buf, 0x0); // Type
+        QUICByteBufs.writeVariableLengthNumber(buf, TYPE); // Type
         return buf;
     }
 
-    static PaddingFrame parseFrom(ByteBuf buf) {
+    static PingFrame parseFrom(ByteBuf buf) {
         long type = QUICByteBufs.readVariableLengthNumber(buf);
 
         return parseFromWithType(type, buf);
     }
 
-    static PaddingFrame parseFromWithType(long type, ByteBuf buf) {
+    // This interface is a little silly in this version, but I want it
+    // consistent across the frames
+    static PingFrame parseFromWithType(long type, ByteBuf buf) {
         assert type == TYPE;
 
         return INSTANCE;

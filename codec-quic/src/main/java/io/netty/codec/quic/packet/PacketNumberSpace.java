@@ -26,6 +26,28 @@ public class PacketNumberSpace {
     private long nextPacketNumber = 0;
     private RangeSet<Long> ackRanges;
 
+    /*
+     ECT0 Count: A variable-length integer representing the total number
+     of packets received with the ECT(0) codepoint in the packet number
+     space of the ACK frame.
+     */
+    private long ect0Count = 0;
+
+    /*
+     ECT1 Count: A variable-length integer representing the total number
+     of packets received with the ECT(1) codepoint in the packet number
+     space of the ACK frame.
+     */
+    private long ect1Count = 0;
+
+    /*
+     CE Count: A variable-length integer representing the total number of
+     packets received with the CE codepoint in the packet number space
+     of the ACK frame.
+     */
+    private long ceCount = 0;
+
+
     public PacketNumberSpace() {
         this.ackRanges = TreeRangeSet.create();
     }
