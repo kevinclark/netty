@@ -14,14 +14,20 @@
  * under the License.
  */
 
-package io.netty.codec.quic.util;
+package io.netty.codec.quic.frame;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.codec.quic.util.QUICByteBufs;
+import io.netty.codec.quic.util.ToByteBuf;
 
-// TODO: Using this vs a write-to-a-destination-centric inferface means either plumbing through an allocator
-//       or accepting that we're going to have potentially a lot of unpooled allocations. The trade off is
-//       that this way we can use lots of composite buffers for composition rather than doing lots of writes.
-//       Debatable whether that's actually better in practice. Needs to be measured.
-public interface ToByteBuf {
-    ByteBuf toByteBuf();
+public class QUICPaddingFrame implements ToByteBuf {
+    public final int TYPE = 0x0;
+
+    @Override
+    public ByteBuf toByteBuf() {
+        ByteBuf buf = Unpooled.buffer(1);
+        QUICByteBufs.writeVariableLengthNumber(buf, TYPE);
+        return buf;
+    }
 }
