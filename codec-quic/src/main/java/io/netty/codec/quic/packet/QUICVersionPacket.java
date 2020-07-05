@@ -20,11 +20,12 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.codec.quic.QUICVersion;
 import io.netty.codec.quic.packet.QUICVersionPacket.Payload;
+import io.netty.codec.quic.util.ToByteBuf;
 
 import java.util.List;
 
 public class QUICVersionPacket extends QUICLongHeaderPacket<Payload> {
-    public static class Payload implements QUICLongHeaderPacket.ToByteBuf {
+    public static class Payload implements ToByteBuf {
         final List<QUICVersion> supportedVersions;
 
         Payload(final List<QUICVersion> supportedVersions) {

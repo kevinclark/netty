@@ -19,8 +19,9 @@ package io.netty.codec.quic.packet;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.codec.quic.util.QUICByteBufs;
+import io.netty.codec.quic.util.ToByteBuf;
 
-public class QUICNumberedPacketPayload implements QUICLongHeaderPacket.ToByteBuf {
+public class QUICNumberedPacketPayload implements ToByteBuf {
     public final QUICPacketNumber number;
     public final ByteBuf payload;
 

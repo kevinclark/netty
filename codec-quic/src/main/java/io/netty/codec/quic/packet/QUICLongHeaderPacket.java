@@ -32,7 +32,7 @@ package io.netty.codec.quic.packet;/*
 
 import io.netty.buffer.ByteBuf;
 import io.netty.codec.quic.QUICVersion;
-import io.netty.codec.quic.packet.QUICLongHeaderPacket.ToByteBuf;
+import io.netty.codec.quic.util.ToByteBuf;
 
 public class QUICLongHeaderPacket<Payload extends ToByteBuf> {
     // 17.2 Long Header Packets - QUIC Draft 29
@@ -48,9 +48,7 @@ public class QUICLongHeaderPacket<Payload extends ToByteBuf> {
     final byte sourceConnIdLength; // Source Connection ID Length (8),
     final ByteBuf sourceConnId; // Source Connection ID (0..160),
 
-    interface ToByteBuf {
-        ByteBuf toByteBuf();
-    };
+    ;
 
     final Payload payload;
 

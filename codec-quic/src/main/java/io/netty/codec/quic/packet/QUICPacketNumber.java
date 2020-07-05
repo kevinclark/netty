@@ -18,7 +18,7 @@ package io.netty.codec.quic.packet;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.codec.quic.packet.QUICLongHeaderPacket.ToByteBuf;
+import io.netty.codec.quic.util.ToByteBuf;
 
 /**
  * TODO: Actually encode based on this, in concert with QUICKPacketNumberSpace.

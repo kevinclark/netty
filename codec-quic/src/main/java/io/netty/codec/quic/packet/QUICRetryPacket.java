@@ -20,6 +20,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.codec.quic.QUICVersion;
 import io.netty.codec.quic.packet.QUICRetryPacket.Payload;
+import io.netty.codec.quic.util.ToByteBuf;
 
 public class QUICRetryPacket extends QUICLongHeaderPacket<Payload> {
     public static class Payload implements ToByteBuf {
