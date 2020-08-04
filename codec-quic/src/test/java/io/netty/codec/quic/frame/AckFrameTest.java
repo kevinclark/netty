@@ -45,6 +45,17 @@ public class AckFrameTest {
         return b;
     }
 
+    private ByteBuf encodeAckFrameWithDelayAndRangesAndECNCounts(long delay, Iterable<Range<Long>> ranges, ECNCounts ecnCounts) {
+        ImmutableRangeSet.Builder<Long> builder = new Builder<Long>();
+        for (Range<Long> range : ranges) {
+            builder.add(range);
+        }
+        final AckFrame frame = AckFrame.createWithECN(delay, builder.build(), ecnCounts);
+        final ByteBuf b = frame.toByteBuf();
+
+        return b;
+    }
+
     @Test
     public void writeWithSingleZeroPacket() {
         final ByteBuf b = encodeAckFrameWithDelayAndRanges(0, Lists.newArrayList(Range.closed(0L, 0L)));
@@ -59,6 +70,32 @@ public class AckFrameTest {
         assertEquals(0, (long)QUICByteBufs.readVariableLengthNumber(b).get());
         // First range
         assertEquals(0, (long)QUICByteBufs.readVariableLengthNumber(b).get());
+
+        assertFalse(b.isReadable());
+    }
+
+    @Test
+    public void writeWithSingleZeroPacketAndECNCounts() {
+        final ByteBuf b =
+                encodeAckFrameWithDelayAndRangesAndECNCounts(0,
+                                                             Lists.newArrayList(Range.closed(0L, 0L)),
+                                                             new ECNCounts(1, 2 ,3));
+
+        // Type
+        assertEquals(0x3, (long)QUICByteBufs.readVariableLengthNumber(b).get());
+        // Largest acknowledged
+        assertEquals(0, (long)QUICByteBufs.readVariableLengthNumber(b).get());
+        // Ack Delay: TBD
+        assertEquals(0, (long)QUICByteBufs.readVariableLengthNumber(b).get());
+        // Ack Range Count
+        assertEquals(0, (long)QUICByteBufs.readVariableLengthNumber(b).get());
+        // First range
+        assertEquals(0, (long)QUICByteBufs.readVariableLengthNumber(b).get());
+
+        // ECN
+        assertEquals(1, (long)QUICByteBufs.readVariableLengthNumber(b).get());
+        assertEquals(2, (long)QUICByteBufs.readVariableLengthNumber(b).get());
+        assertEquals(3, (long)QUICByteBufs.readVariableLengthNumber(b).get());
 
         assertFalse(b.isReadable());
     }
