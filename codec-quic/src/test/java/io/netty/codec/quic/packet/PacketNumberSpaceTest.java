@@ -27,18 +27,18 @@ public class PacketNumberSpaceTest {
     @Test
     public void getLargestPacketNumberReceived() {
         PacketNumberSpace space = new PacketNumberSpace();
-        assertEquals(Optional.empty(), space.getLargestPacketNumberReceived());
+        assertEquals(Optional.empty(), space.getLargestPacketNumberAcknowledged());
 
         space.ack(Range.closed(0L, 0L));
-        assertEquals(0, (long)space.getLargestPacketNumberReceived().get());
+        assertEquals(0, (long)space.getLargestPacketNumberAcknowledged().get());
 
         space.ack(Range.closed(0L, 10L));
-        assertEquals(10, (long)space.getLargestPacketNumberReceived().get());
+        assertEquals(10, (long)space.getLargestPacketNumberAcknowledged().get());
 
         space.ack(Range.closed(20L, 30L));
-        assertEquals(30, (long)space.getLargestPacketNumberReceived().get());
+        assertEquals(30, (long)space.getLargestPacketNumberAcknowledged().get());
 
         space.ack(Range.closed(11L, 15L));
-        assertEquals(30, (long)space.getLargestPacketNumberReceived().get());
+        assertEquals(30, (long)space.getLargestPacketNumberAcknowledged().get());
     }
 }

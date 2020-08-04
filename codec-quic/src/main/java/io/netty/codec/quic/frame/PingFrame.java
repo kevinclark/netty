@@ -31,7 +31,6 @@ public class PingFrame extends Frame {
 
     private PingFrame() {};
 
-    @Override
     public ByteBuf toByteBuf() {
         ByteBuf buf = Unpooled.buffer(1);
         QUICByteBufs.writeVariableLengthNumber(buf, TYPE); // Type

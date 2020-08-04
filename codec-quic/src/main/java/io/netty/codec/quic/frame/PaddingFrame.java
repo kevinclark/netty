@@ -31,7 +31,6 @@ public class PaddingFrame extends Frame {
 
     private PaddingFrame() {};
 
-    @Override
     public ByteBuf toByteBuf() {
         ByteBuf buf = Unpooled.buffer(1);
         QUICByteBufs.writeVariableLengthNumber(buf, 0x0); // Type

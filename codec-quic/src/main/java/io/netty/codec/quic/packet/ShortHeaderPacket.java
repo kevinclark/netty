@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package io.netty.codec.quic.frame;
+package io.netty.codec.quic.packet;
 
-public abstract class Frame {
+public class ShortHeaderPacket {
 }
