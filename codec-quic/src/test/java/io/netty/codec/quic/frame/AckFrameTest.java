@@ -17,8 +17,9 @@
 package io.netty.codec.quic.frame;
 
 import com.google.common.collect.ImmutableRangeSet;
+import com.google.common.collect.ImmutableRangeSet.Builder;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
-import com.google.common.collect.RangeSet;
 import io.netty.buffer.ByteBuf;
 import io.netty.codec.quic.util.QUICByteBufs;
 import org.junit.Test;
@@ -27,14 +28,20 @@ import static org.junit.Assert.*;
 
 public class AckFrameTest {
 
+    private ByteBuf encodeAckFrameWithDelayAndRanges(long delay, Iterable<Range<Long>> ranges) {
+        ImmutableRangeSet.Builder<Long> builder = new Builder<Long>();
+        for (Range<Long> range : ranges) {
+            builder.add(range);
+        }
+        final AckFrame frame = AckFrame.create(delay, builder.build());
+        final ByteBuf b = frame.toByteBuf();
+
+        return b;
+    }
+
     @Test
     public void toByteBufWithSingleZeroPacket() {
-        RangeSet<Long> ranges = new ImmutableRangeSet.Builder<Long>()
-                                        .add(Range.closed(0L, 0L))
-                                        .build();
-
-        final AckFrame frame = AckFrame.create(ranges);
-        final ByteBuf b = frame.toByteBuf();
+        final ByteBuf b = encodeAckFrameWithDelayAndRanges(0, Lists.newArrayList(Range.closed(0L, 0L)));
 
         // Type
         assertEquals(0x2, QUICByteBufs.readVariableLengthNumber(b));
@@ -52,43 +59,31 @@ public class AckFrameTest {
 
     @Test
     public void toByteBufWithSingleNonZeroPacket() {
-        RangeSet<Long> ranges = new ImmutableRangeSet.Builder<Long>()
-                .add(Range.closed(2L, 2L))
-                .build();
-
-        final AckFrame frame = AckFrame.create(ranges);
-        final ByteBuf b = frame.toByteBuf();
-
+        final ByteBuf b = encodeAckFrameWithDelayAndRanges(63, Lists.newArrayList(Range.closed(2L, 2L)));
         // Type
         assertEquals(0x2, QUICByteBufs.readVariableLengthNumber(b));
         // Largest acknowledged
         assertEquals(2, QUICByteBufs.readVariableLengthNumber(b));
-        // Ack Delay: TBD
-        assertEquals(0, QUICByteBufs.readVariableLengthNumber(b));
+        // Ack Delay
+        assertEquals(63, QUICByteBufs.readVariableLengthNumber(b));
         // Ack Range Count
         assertEquals(0, QUICByteBufs.readVariableLengthNumber(b));
         // First range
         assertEquals(0, QUICByteBufs.readVariableLengthNumber(b));
-
-        assertFalse(b.isReadable());
     }
 
     @Test
     public void toByteBufWithMultipleRanges() {
-        RangeSet<Long> ranges = new ImmutableRangeSet.Builder<Long>()
-                .add(Range.closed(2L, 2L))
-                .add(Range.closed(0L, 0L))
-                .build();
-
-        final AckFrame frame = AckFrame.create(ranges);
-        final ByteBuf b = frame.toByteBuf();
-
+        final ByteBuf b =
+                encodeAckFrameWithDelayAndRanges(63,
+                                                 Lists.newArrayList(Range.closed(2L, 2L),
+                                                                    Range.closed(0L, 0L)));
         // Type
         assertEquals(0x2, QUICByteBufs.readVariableLengthNumber(b));
         // Largest acknowledged
         assertEquals(2, QUICByteBufs.readVariableLengthNumber(b));
-        // Ack Delay: TBD
-        assertEquals(0, QUICByteBufs.readVariableLengthNumber(b));
+        // Ack Delay
+        assertEquals(63, QUICByteBufs.readVariableLengthNumber(b));
         // Ack Range Count
         assertEquals(1, QUICByteBufs.readVariableLengthNumber(b));
         // First range

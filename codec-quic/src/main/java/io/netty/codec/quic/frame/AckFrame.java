@@ -41,20 +41,22 @@ import java.util.function.Consumer;
    }
  */
 public class AckFrame extends Frame {
+    final public long delay;
     final public RangeSet<Long> ranges;
     final public Optional<ECNCounts> ecnCounts;
 
-    public static AckFrame createWithECN(final RangeSet<Long> ranges, final ECNCounts ecnCounts) {
-        return new AckFrame(ranges, ecnCounts);
+    public static AckFrame createWithECN(final long delay, final RangeSet<Long> ranges, final ECNCounts ecnCounts) {
+        return new AckFrame(delay, ranges, ecnCounts);
     }
 
-    public static AckFrame create(final RangeSet<Long> ranges) {
-        return new AckFrame(ranges, null);
+    public static AckFrame create(final long delay, final RangeSet<Long> ranges) {
+        return new AckFrame(delay, ranges, null);
     }
 
-    private AckFrame(final RangeSet<Long> ranges, final ECNCounts ecnCounts) {
+    private AckFrame(final long delay, final RangeSet<Long> ranges, final ECNCounts ecnCounts) {
         assert(! ranges.isEmpty());
 
+        this.delay = delay;
         this.ranges = ranges;
         this.ecnCounts = Optional.ofNullable(ecnCounts);
     }
@@ -66,9 +68,9 @@ public class AckFrame extends Frame {
 
         final ByteBuf buf = Unpooled.buffer();
         QUICByteBufs.writeVariableLengthNumber(buf, this.ecnCounts.isEmpty() ? 0x2 : 0x3); // Type (i) = 0x02..0x03
-        QUICByteBufs.writeVariableLengthNumber(buf, range.upperEndpoint()); // Largest Acknowledged (i)
-        QUICByteBufs.writeVariableLengthNumber(buf, 0);                              // TODO: ACK Delay (i)
-        QUICByteBufs.writeVariableLengthNumber(buf, descendingRanges.size() - 1);              // ACK Range Count (i)
+        QUICByteBufs.writeVariableLengthNumber(buf, range.upperEndpoint());                // Largest Acknowledged (i)
+        QUICByteBufs.writeVariableLengthNumber(buf, delay);                                // ACK Delay (i)
+        QUICByteBufs.writeVariableLengthNumber(buf, descendingRanges.size() - 1);    // ACK Range Count (i)
 
         /*
         First ACK Range: A variable-length integer indicating the number of contiguous packets preceding the
