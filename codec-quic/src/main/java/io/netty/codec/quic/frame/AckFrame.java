@@ -16,14 +16,16 @@
 
 package io.netty.codec.quic.frame;
 
+import com.google.common.collect.ImmutableRangeSet;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.codec.quic.packet.PacketNumberSpace.ECNCounts;
+import io.netty.codec.quic.packet.ECNCounts;
 import io.netty.codec.quic.util.QUICByteBufs;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -61,12 +63,68 @@ public class AckFrame extends Frame {
         this.ecnCounts = Optional.ofNullable(ecnCounts);
     }
 
-    public ByteBuf toByteBuf() {
+    /**
+     * Parse an ACK frame from the provided byte buffer. Type byte is expected to be passed already.
+     * @param buf - The buffer to read.
+     * @return An Optional.of(AckFrame) or Optional.empty if there's a frame encoding error
+     */
+    public static Optional<AckFrame> readFrom(final ByteBuf buf, final boolean hasECNCounts) {
+        try {
+            final long largestAckd = QUICByteBufs.readVariableLengthNumber(buf).get();
+            final long delay = QUICByteBufs.readVariableLengthNumber(buf).get();
+            final long ackRangeCount = QUICByteBufs.readVariableLengthNumber(buf).get();
+
+            if (ackRangeCount < 0) {
+                return Optional.empty();
+            }
+            long smallest = largestAckd - QUICByteBufs.readVariableLengthNumber(buf).get();
+            if (smallest < 0) {
+                return Optional.empty();
+            }
+
+            ImmutableRangeSet.Builder<Long> ranges = ImmutableRangeSet.builder();
+            ranges.add(Range.closed(smallest, largestAckd));
+
+            for (int i = 0; i != ackRangeCount; ++i) {
+                final long gap = QUICByteBufs.readVariableLengthNumber(buf).get();
+                final long len = QUICByteBufs.readVariableLengthNumber(buf).get();
+
+                final long upper = -gap + smallest - 2;
+                final long lower = upper - len;
+
+                if (lower < 0) {
+                    return Optional.empty();
+                }
+
+                ranges.add(Range.closed(lower, upper));
+
+                smallest = lower;
+            }
+
+            if (hasECNCounts) {
+                final long ecn0Count = QUICByteBufs.readVariableLengthNumber(buf).get();
+                final long ecn1Count = QUICByteBufs.readVariableLengthNumber(buf).get();
+                final long ceCount = QUICByteBufs.readVariableLengthNumber(buf).get();
+
+                return Optional.of(createWithECN(delay, ranges.build(), new ECNCounts(ecn0Count, ecn1Count, ceCount)));
+            } else {
+                return Optional.of(create(delay, ranges.build()));
+            }
+
+        } catch (NoSuchElementException e) {
+            return Optional.empty();
+        }
+    }
+
+//    public static AckFrame readFromWithECN(final ByteBuf buf) {
+//
+//    }
+
+    public void writeTo(final ByteBuf buf) {
         final Set<Range<Long>> descendingRanges = this.ranges.asDescendingSetOfRanges();
         final Iterator<Range<Long>> rangeIter = descendingRanges.iterator();
         Range<Long> range = rangeIter.next();
 
-        final ByteBuf buf = Unpooled.buffer();
         QUICByteBufs.writeVariableLengthNumber(buf, this.ecnCounts.isEmpty() ? 0x2 : 0x3); // Type (i) = 0x02..0x03
         QUICByteBufs.writeVariableLengthNumber(buf, range.upperEndpoint());                // Largest Acknowledged (i)
         QUICByteBufs.writeVariableLengthNumber(buf, delay);                                // ACK Delay (i)
@@ -107,6 +165,12 @@ public class AckFrame extends Frame {
                 QUICByteBufs.writeVariableLengthNumber(buf, ecnCounts.ceCount);
             }
         });
+    }
+
+    public ByteBuf toByteBuf() {
+        final ByteBuf buf = Unpooled.buffer();
+
+        writeTo(buf);
 
         return buf;
     }

@@ -35,7 +35,7 @@ public class InitialPacketTest {
         assertEquals(5, buf.readInt()); // Tok length
         assertEquals(tok.slice(), buf.readBytes(5)); // Then tok
         // Then remaining length, which is the packet number length plus the length of payloadBuf
-        assertEquals(4 + payloadBuf.readableBytes(), QUICByteBufs.readVariableLengthNumber(buf));
+        assertEquals(4 + payloadBuf.readableBytes(), (long)QUICByteBufs.readVariableLengthNumber(buf).get());
         assertEquals(1 << 25, buf.readInt());
         assertEquals(payloadBuf, buf.slice());
     }

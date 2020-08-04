@@ -19,6 +19,8 @@ package io.netty.codec.quic.util;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
+import java.util.Optional;
+
 public class QUICByteBufs {
     static public ByteBuf encodeVariableLengthNumber(long value) {
         final ByteBuf result = Unpooled.buffer(8);
@@ -43,7 +45,7 @@ public class QUICByteBufs {
         }
     }
 
-    static public long readVariableLengthNumber(final ByteBuf buf) {
+    static public Optional<Long> readVariableLengthNumber(final ByteBuf buf) {
         ByteBuf conversionBuf = Unpooled.buffer(8);
         byte firstByte = buf.readByte();
 
@@ -53,23 +55,22 @@ public class QUICByteBufs {
         switch (firstByte & 0xc0) {
         case 0xc0: // Eight bytes
             conversionBuf.writeBytes(buf.readBytes(7));
-            return conversionBuf.readLong();
+            return Optional.of(conversionBuf.readLong());
 
         case 0x80: // Four bytes
             conversionBuf.writeBytes(buf.readBytes(3));
-            return conversionBuf.readInt();
+            return Optional.of((long) conversionBuf.readInt());
 
         case 0x40: // Two bytes
             conversionBuf.writeByte(buf.readByte());
-            return conversionBuf.readShort();
+            return Optional.of((long) conversionBuf.readShort());
 
         case 0x00:
-            return conversionBuf.readByte();
+            return Optional.of((long) conversionBuf.readByte());
 
         default:
             assert false;
+            return Optional.empty();
         }
-
-        return -1;
     }
 }

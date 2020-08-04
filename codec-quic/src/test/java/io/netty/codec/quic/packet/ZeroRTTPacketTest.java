@@ -30,7 +30,7 @@ public class ZeroRTTPacketTest {
         final ByteBuf payload = Unpooled.wrappedBuffer("payload".getBytes(Charsets.UTF_8));
         final ByteBuf buf = new NumberedPacketPayload(new PacketNumber(5), payload).toByteBuf();
 
-        assertEquals(1 + payload.readableBytes(), QUICByteBufs.readVariableLengthNumber(buf));
+        assertEquals(1 + payload.readableBytes(), (long)QUICByteBufs.readVariableLengthNumber(buf).get());
         assertEquals(5, buf.readByte());
         assertEquals(payload.slice(), buf.readBytes(payload.readableBytes()));
     }

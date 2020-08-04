@@ -26,28 +26,6 @@ public class PacketNumberSpace {
     private long nextPacketNumber = 0;
     private RangeSet<Long> ackRanges;
 
-    public static class ECNCounts {
-        /*
-         ECT0 Count: A variable-length integer representing the total number
-         of packets received with the ECT(0) codepoint in the packet number
-         space of the ACK frame.
-         */
-        public long ect0Count = 0;
-
-        /*
-         ECT1 Count: A variable-length integer representing the total number
-         of packets received with the ECT(1) codepoint in the packet number
-         space of the ACK frame.
-         */
-        public long ect1Count = 0;
-
-        /*
-         CE Count: A variable-length integer representing the total number of
-         packets received with the CE codepoint in the packet number space
-         of the ACK frame.
-         */
-        public long ceCount = 0;
-    }
     private ECNCounts ecnCounts;
 
     public PacketNumberSpace() {
